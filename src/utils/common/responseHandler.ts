@@ -1,16 +1,16 @@
 import { StatusCodes, ReasonPhrases } from "http-status-codes";
 import type { Response } from "express";
 
-
-interface ApiSuccessResponse <T> {
+// TS must be able to describe its return type to other files.
+export interface ApiSuccessResponse <T> {
     success : true,
     data : T,
     message : string
 }
 
-interface ApiErrorResponse {
+export interface ApiErrorResponse {
   success : false,
-  message : string
+  message : string,
 }
 
 
@@ -32,10 +32,10 @@ export const SuccessResponse = <T> (
 export const ErrorResponse = (
   res : Response,
   message : string = ReasonPhrases.INTERNAL_SERVER_ERROR,
-  statusCode : number = StatusCodes.INTERNAL_SERVER_ERROR
+  statusCode : number = StatusCodes.INTERNAL_SERVER_ERROR,
 ) : Response <ApiErrorResponse> => {
   return res.status(statusCode).json({
     success : false,
-    message
+    message,
   })
 }
