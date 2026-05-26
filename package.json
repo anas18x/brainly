@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "start": "tsc -b && node dist/index.js"
   },
   "keywords": [],
@@ -29,6 +29,7 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.1",
-    "ts-node-dev": "^2.0.0"
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.22.3"
   }
 }
