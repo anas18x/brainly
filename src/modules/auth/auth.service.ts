@@ -1,9 +1,12 @@
-import type { RegisterInput, LoginInput } from "./auth.schema.js";
+import type { RegisterInput, LoginInput , ChangePasswordInput } from "./auth.schema.js";
 import bcrypt from 'bcrypt';
 import User from "../users/user.model.js";
 import AppError from "../../utils/error/AppError.js";
 import { StatusCodes } from "http-status-codes";
 import { generateAccessToken, generateRefreshToken } from "../../utils/common/tokens.js";
+import jwt from "jsonwebtoken";
+import {ENV} from "../../config/ENV.config.js"
+
 
 
 export const registerService = async (
@@ -30,7 +33,6 @@ export const registerService = async (
 
 
 
-
 export const loginService = async (
     payload : LoginInput
 ) => {
@@ -46,8 +48,9 @@ export const loginService = async (
     if(isPasswordMatched){
         const accessToken = generateAccessToken(user._id.toString())
         const refreshToken = generateRefreshToken(user._id.toString())
+        const hashedRefreshToken = await bcrypt.hash(refreshToken, 10)
 
-        user.refreshToken = refreshToken
+        user.refreshToken = hashedRefreshToken
         await user.save()
 
         return {
@@ -65,3 +68,55 @@ export const loginService = async (
     }
 }
 
+
+
+export const logoutService = async (
+    userId : string
+) => {
+    const user = await User.findById(userId)
+    if(!user) throw new AppError("User not found", StatusCodes.NOT_FOUND)
+
+    user.refreshToken = null
+    await user.save()    
+}
+
+
+
+export const changePasswordService = async (
+    userId : string,
+    payload : ChangePasswordInput
+) => {
+
+    const user = await User.findById(userId)
+    if(!user) throw new AppError("User not found", StatusCodes.NOT_FOUND)
+
+    if(!await bcrypt.compare(payload.oldPassword, user.password)) {
+        throw new AppError("Old password is incorrect", StatusCodes.UNAUTHORIZED)
+    }
+    const hashedNewPassword = await bcrypt.hash(payload.newPassword, 10)
+    user.password = hashedNewPassword
+    user.refreshToken = null // Invalidate existing refresh tokens on password change
+    await user.save()
+
+}
+
+
+
+export const refreshTokenService = async (
+    refreshToken : string
+) => {
+    if(!refreshToken) throw new AppError("Refresh token is missing", StatusCodes.UNAUTHORIZED)
+
+    const decoded = jwt.verify(refreshToken, ENV.JWT_SECRET) as {userId : string}
+
+    const user = await User.findById(decoded.userId)
+    if(!user || !user.refreshToken) throw new AppError("Invalid refresh token", StatusCodes.UNAUTHORIZED)   
+        
+    if(!await bcrypt.compare(refreshToken, user.refreshToken)) {
+        throw new AppError("Invalid refresh token", StatusCodes.UNAUTHORIZED)
+    }
+    
+    const accessToken = generateAccessToken(user._id.toString())
+    return {accessToken}
+
+}

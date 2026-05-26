@@ -4,7 +4,7 @@ import { ENV } from './config/ENV.config.js';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import v1Routes from './routes/v1/index.js';
-import errorMiddleware from './middleware/errorMiddleware.js';
+import errorMiddleware from './middleware/error.Middleware.js';
 
 
 const limiter = rateLimit({
