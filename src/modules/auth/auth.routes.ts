@@ -1,11 +1,12 @@
 import { Router } from "express";
 import  {validate}  from "../../middleware/validate.middleware.js";
 import { registerSchema, loginSchema, changePasswordSchema } from "./auth.schema.js";
-import { loginController, logoutController, registerController, changePasswordController, refreshTokenController } from "./auth.controller.js";
+import { loginController, logoutController, registerController, changePasswordController, refreshTokenController, getMeController } from "./auth.controller.js";
 import {authMiddleware} from "../../middleware/auth.middleware.js";
 
-
 const router = Router()
+
+router.get("/me", authMiddleware, getMeController )
 
 router.post("/register",
           validate(registerSchema),

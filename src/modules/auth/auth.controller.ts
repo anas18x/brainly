@@ -5,6 +5,20 @@ import * as authService from "./auth.service.js";
 
 
 
+export const getMeController = async (
+    req : Request,
+    res : Response,
+    next : NextFunction
+) => {
+    try {
+        const user = await authService.getCurrentUser(req.user!.userId)
+        SuccessResponse(res, user, "User details fetched successfully", StatusCodes.OK)
+    } catch (error) {
+        next(error)
+    }
+}
+
+
 export const registerController = async (
     req : Request,
     res : Response,

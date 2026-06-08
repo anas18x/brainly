@@ -8,6 +8,21 @@ import jwt from "jsonwebtoken";
 import {ENV} from "../../config/ENV.config.js"
 
 
+export const getCurrentUser = async (
+    userId : string
+) => {
+    const user = await User.findById(userId).select("username shareSlug isBrainPublic")
+    if(!user) throw new AppError("User not found", StatusCodes.NOT_FOUND)
+
+    return {
+        id: user._id,
+        username: user.username,
+        shareSlug: user.shareSlug,
+        isBrainPublic: user.isBrainPublic
+    }
+}
+
+
 
 export const register = async (
     payload : RegisterInput
