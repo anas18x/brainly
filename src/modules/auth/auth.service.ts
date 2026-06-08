@@ -9,7 +9,7 @@ import {ENV} from "../../config/ENV.config.js"
 
 
 
-export const registerService = async (
+export const register = async (
     payload : RegisterInput
 ) => {
    
@@ -33,7 +33,7 @@ export const registerService = async (
 
 
 
-export const loginService = async (
+export const login = async (
     payload : LoginInput
 ) => {
 
@@ -70,7 +70,7 @@ export const loginService = async (
 
 
 
-export const logoutService = async (
+export const logout = async (
     userId : string
 ) => {
     const user = await User.findById(userId)
@@ -82,7 +82,7 @@ export const logoutService = async (
 
 
 
-export const changePasswordService = async (
+export const changePassword = async (
     userId : string,
     payload : ChangePasswordInput
 ) => {
@@ -102,7 +102,7 @@ export const changePasswordService = async (
 
 
 
-export const refreshTokenService = async (
+export const refreshToken = async (
     refreshToken : string
 ) => {
     if(!refreshToken) throw new AppError("Refresh token is missing", StatusCodes.UNAUTHORIZED)

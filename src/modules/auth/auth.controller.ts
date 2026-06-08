@@ -1,7 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
-import { loginService, logoutService, registerService, changePasswordService, refreshTokenService } from "./auth.service.js";
 import  StatusCodes from "http-status-codes";
 import { SuccessResponse } from "../../utils/common/responseHandler.js";
+import * as authService from "./auth.service.js";
+
 
 
 export const registerController = async (
@@ -10,7 +11,7 @@ export const registerController = async (
     next : NextFunction
 ) => {
     try {
-        const user = await registerService(req.body)
+        const user = await authService.register(req.body)
         SuccessResponse(res, user, "User registered successfully", StatusCodes.CREATED)
     } catch (error) {
         next(error)
@@ -25,7 +26,7 @@ export const loginController = async (
 ) => {
 
     try{
-        const result = await loginService(req.body)
+        const result = await authService.login(req.body)
 
         res.cookie(
             "accessToken",
@@ -60,7 +61,7 @@ export const logoutController = async (
     next : NextFunction
 ) => {
     try{
-        await logoutService(req.user!.userId)
+        await authService.logout(req.user!.userId)
         res.clearCookie("accessToken")
         res.clearCookie("refreshToken")
         SuccessResponse(res, null, "Logout successful", StatusCodes.OK)
@@ -79,7 +80,7 @@ export const changePasswordController = async (
 ) => {
 
     try{
-        await changePasswordService(req.user!.userId, req.body)
+        await authService.changePassword(req.user!.userId, req.body)
         res.clearCookie("accessToken")
         res.clearCookie("refreshToken")
         SuccessResponse(res, null, "Password changed successfully. Please log in again.", StatusCodes.OK)
@@ -98,7 +99,7 @@ export const refreshTokenController = async (
 ) => {
 
     try{
-        const result = await refreshTokenService(req.cookies.refreshToken)
+        const result = await authService.refreshToken(req.cookies.refreshToken)
 
         res.cookie(
             "accessToken",
