@@ -5,7 +5,7 @@ import { ErrorResponse} from "../utils/common/responseHandler.js";
 import {fromError} from "zod-validation-error";
 
 
-const validate = ( schema: ZodSchema) => {
+export const validate = ( schema: ZodSchema) => {
 
   // FUNCTION that RETURNS middleware
   return ( req: Request, res: Response, next: NextFunction) => {
@@ -23,4 +23,18 @@ const validate = ( schema: ZodSchema) => {
   };
 };
 
-export default validate;
+
+
+export const validateQuery = ( schema: ZodSchema) => {
+  return ( req: Request, res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.query);
+
+    if (!result.success) {
+      const validationErrors = fromError(result.error)
+      return ErrorResponse( res, validationErrors.message ,StatusCodes.BAD_REQUEST);
+    }
+
+    next();
+  }
+}
+
