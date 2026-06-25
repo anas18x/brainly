@@ -38,3 +38,14 @@ export const validateQuery = ( schema: ZodSchema) => {
   }
 }
 
+
+export const validateParams = ( schema: ZodSchema) => {
+  return ( req: Request, res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.params);
+    if (!result.success) {
+      const validationErrors = fromError(result.error)
+      return ErrorResponse( res, validationErrors.message ,StatusCodes.BAD_REQUEST);
+    }
+    next();
+  }
+}
