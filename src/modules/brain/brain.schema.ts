@@ -18,15 +18,15 @@ export const createBrainSchema = z.object({
 export const updateBrainSchema = z.object({
     title: z.string().trim().min(1, "Title is required").max(200).optional(),
     body: z.string().trim().optional(),
-    url: z.string().trim().url("Invalid URL").optional(),
+    url: z.string().trim().url("Invalid URL").optional().refine(
+      (val) => val === "" || z.string().url().safeParse(val).success,
+    ),
     tags: z.array(z.string().trim()).max(10).optional(),
   })
   .refine(
     (data) =>
-      data.title !== undefined ||
-      data.body !== undefined ||
-      data.url !== undefined ||
-      data.tags !== undefined,
+      data.title !== undefined  ||  data.body !== undefined ||
+      data.url !== undefined    ||  data.tags !== undefined,
     {
       message: "At least one field must be provided for update",
     },
@@ -46,6 +46,11 @@ export const brainIdParamsSchema = z.object({
   id: z.string().refine(mongoose.Types.ObjectId.isValid, {
     message: "Invalid brain ID",
   }),
+});
+
+// since shareSlug is a string, we can just validate it as a non-empty string
+export const shareSlugParamsSchema = z.object({
+  shareSlug: z.string().trim().min(1),
 });
 
 
